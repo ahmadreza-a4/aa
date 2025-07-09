@@ -1,3 +1,4 @@
+
 import os
 import logging
 from aiogram import Bot, Dispatcher, types, Router, F
@@ -42,11 +43,13 @@ LOCATIONS = {
 }
 
 user_orders = {}
+support_waiting_users = set()
 
 def main_menu():
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="✨ خرید اشتراک", callback_data="buy")],
-        [InlineKeyboardButton(text="ℹ️ مشخصات اشتراک", callback_data="info")]
+        [InlineKeyboardButton(text="ℹ️ مشخصات اشتراک", callback_data="info")],
+        [InlineKeyboardButton(text="📩 ارتباط با پشتیبانی", callback_data="support")]
     ])
     return kb
 
@@ -59,7 +62,7 @@ async def start_cmd(message: Message):
 
 @router.callback_query(F.data == "info")
 async def handle_info(callback: CallbackQuery):
-    await bot.send_message("ADMIN_ID", f"درخواست مشخصات از کاربر: {callback.from_user.id}")
+    await bot.send_message(ADMIN_ID, f"درخواست مشخصات از کاربر: {callback.from_user.id}")
     await callback.message.answer("درخواست شما ثبت شد، منتظر پاسخ مدیر باشید.", reply_markup=back_button())
     await callback.answer()
 
@@ -150,12 +153,12 @@ async def wait_for_receipt(callback: CallbackQuery):
 @router.message(F.content_type == ContentType.PHOTO)
 async def handle_photo_receipt(message: Message):
     if message.from_user.id in user_orders:
-        await message.forward("ADMIN_ID")
+        await message.forward(ADMIN_ID)
         await message.answer("فیش شما ارسال شد. لطفا منتظر تایید مدیر بمانید.")
 
 @router.message(Command("send_config"))
 async def handle_config(message: Message):
-    if message.from_user.id != "ADMIN_ID":
+    if message.from_user.id != ADMIN_ID:
         return
     parts = message.text.split(" ", 2)
     if len(parts) < 3:
@@ -167,6 +170,41 @@ async def handle_config(message: Message):
         await message.answer("ارسال شد.")
     except Exception as e:
         await message.answer(f"خطا: {e}")
+
+@router.callback_query(F.data == "support")
+async def support_request(callback: CallbackQuery):
+    support_waiting_users.add(callback.from_user.id)
+    await callback.message.answer("لطفاً پیام خود را ارسال کنید تا به پشتیبانی منتقل شود:")
+    await callback.answer()
+
+@router.message()
+async def handle_all_messages(message: Message):
+    uid = message.from_user.id
+
+    if uid in support_waiting_users:
+        support_waiting_users.remove(uid)
+        forward = await bot.forward_message(ADMIN_ID, uid, message.message_id)
+        await bot.send_message(
+            ADMIN_ID,
+            f"📨 پیام جدید از کاربر:\n"
+            f"🆔 <code>{uid}</code>\n"
+            f"پاسخ به این پیام برای پاسخ به کاربر ارسال شود.",
+            reply_to_message_id=forward.message_id
+        )
+        await message.answer("✅ پیام شما به پشتیبانی ارسال شد.")
+        return
+
+    if message.from_user.id == ADMIN_ID and message.reply_to_message:
+        try:
+            fwd_msg = message.reply_to_message
+            if fwd_msg.forward_from:
+                target_user_id = fwd_msg.forward_from.id
+                await bot.send_message(target_user_id, f"📬 پاسخ پشتیبانی:\n{message.text}")
+                await message.answer("✅ پیام شما برای کاربر ارسال شد.")
+            else:
+                await message.answer("❌ لطفاً روی پیام فوروارد شده از کاربر پاسخ دهید.")
+        except Exception as e:
+            await message.answer(f"❌ خطا در ارسال پاسخ: {e}")
 
 def back_button():
     return InlineKeyboardMarkup(inline_keyboard=[
