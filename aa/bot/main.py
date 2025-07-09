@@ -1,4 +1,3 @@
-
 import os
 import logging
 from aiogram import Bot, Dispatcher, types, Router, F
@@ -171,6 +170,18 @@ async def handle_config(message: Message):
     except Exception as e:
         await message.answer(f"Ø®Ø·Ø§: {e}")
 
+def back_button():
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="ðŸ”™ Ø¨Ø§Ø²Ú¯Ø´Øª Ø¨Ù‡ Ù…Ù†Ùˆ", callback_data="main")]
+    ])
+
+@router.callback_query(F.data == "main")
+async def back_to_menu(callback: CallbackQuery):
+    await callback.message.answer("Ø¨Ø§Ø²Ú¯Ø´Øª Ø¨Ù‡ Ù…Ù†Ùˆ:", reply_markup=main_menu())
+    await callback.answer()
+
+
+
 @router.callback_query(F.data == "support")
 async def support_request(callback: CallbackQuery):
     support_waiting_users.add(callback.from_user.id)
@@ -205,16 +216,6 @@ async def handle_all_messages(message: Message):
                 await message.answer("âŒ Ù„Ø·ÙØ§Ù‹ Ø±ÙˆÛŒ Ù¾ÛŒØ§Ù… ÙÙˆØ±ÙˆØ§Ø±Ø¯ Ø´Ø¯Ù‡ Ø§Ø² Ú©Ø§Ø±Ø¨Ø± Ù¾Ø§Ø³Ø® Ø¯Ù‡ÛŒØ¯.")
         except Exception as e:
             await message.answer(f"âŒ Ø®Ø·Ø§ Ø¯Ø± Ø§Ø±Ø³Ø§Ù„ Ù¾Ø§Ø³Ø®: {e}")
-
-def back_button():
-    return InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="ðŸ”™ Ø¨Ø§Ø²Ú¯Ø´Øª Ø¨Ù‡ Ù…Ù†Ùˆ", callback_data="main")]
-    ])
-
-@router.callback_query(F.data == "main")
-async def back_to_menu(callback: CallbackQuery):
-    await callback.message.answer("Ø¨Ø§Ø²Ú¯Ø´Øª Ø¨Ù‡ Ù…Ù†Ùˆ:", reply_markup=main_menu())
-    await callback.answer()
 
 async def main():
     await dp.start_polling(bot)
