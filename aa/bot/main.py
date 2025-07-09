@@ -36,10 +36,10 @@ PRICES = {
 }
 
 LOCATIONS = {
-    "france": "🇫🇷 فرانسه",
-    "sweden": "🇸🇪 سوئد",
-    "austria": "🇦🇹 اتریش",
-    "netherlands": "🇳🇱 هلند"
+    "france": "ðŸ‡«ðŸ‡· ÙØ±Ø§Ù†Ø³Ù‡",
+    "sweden": "ðŸ‡¸ðŸ‡ª Ø³ÙˆØ¦Ø¯",
+    "austria": "ðŸ‡¦ðŸ‡¹ Ø§ØªØ±ÛŒØ´",
+    "netherlands": "ðŸ‡³ðŸ‡± Ù‡Ù„Ù†Ø¯"
 }
 
 user_orders = {}
@@ -47,23 +47,23 @@ support_waiting_users = set()
 
 def main_menu():
     kb = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="✨ خرید اشتراک", callback_data="buy")],
-        [InlineKeyboardButton(text="ℹ️ مشخصات اشتراک", callback_data="info")],
-        [InlineKeyboardButton(text="📩 ارتباط با پشتیبانی", callback_data="support")]
+        [InlineKeyboardButton(text="âœ¨ Ø®Ø±ÛŒØ¯ Ø§Ø´ØªØ±Ø§Ú©", callback_data="buy")],
+        [InlineKeyboardButton(text="â„¹ï¸ Ù…Ø´Ø®ØµØ§Øª Ø§Ø´ØªØ±Ø§Ú©", callback_data="info")],
+        [InlineKeyboardButton(text="ðŸ“© Ø§Ø±ØªØ¨Ø§Ø· Ø¨Ø§ Ù¾Ø´ØªÛŒØ¨Ø§Ù†ÛŒ", callback_data="support")]
     ])
     return kb
 
 @router.message(Command("start"))
 async def start_cmd(message: Message):
     await message.answer(
-        "به ربات فروش کانفیگ‌های پرسرعت ویتوری خوش آمدید\n\n⚡ پشتیبانی ۲۴ ساعته\n📱 مناسب برای انواع دستگاه‌ها",
+        "Ø¨Ù‡ Ø±Ø¨Ø§Øª ÙØ±ÙˆØ´ Ú©Ø§Ù†ÙÛŒÚ¯â€ŒÙ‡Ø§ÛŒ Ù¾Ø±Ø³Ø±Ø¹Øª ÙˆÛŒØªÙˆØ±ÛŒ Ø®ÙˆØ´ Ø¢Ù…Ø¯ÛŒØ¯\n\nâš¡ Ù¾Ø´ØªÛŒØ¨Ø§Ù†ÛŒ Û²Û´ Ø³Ø§Ø¹ØªÙ‡\nðŸ“± Ù…Ù†Ø§Ø³Ø¨ Ø¨Ø±Ø§ÛŒ Ø§Ù†ÙˆØ§Ø¹ Ø¯Ø³ØªÚ¯Ø§Ù‡â€ŒÙ‡Ø§",
         reply_markup=main_menu()
     )
 
 @router.callback_query(F.data == "info")
 async def handle_info(callback: CallbackQuery):
-    await bot.send_message(ADMIN_ID, f"درخواست مشخصات از کاربر: {callback.from_user.id}")
-    await callback.message.answer("درخواست شما ثبت شد، منتظر پاسخ مدیر باشید.", reply_markup=back_button())
+    await bot.send_message(ADMIN_ID, f"Ø¯Ø±Ø®ÙˆØ§Ø³Øª Ù…Ø´Ø®ØµØ§Øª Ø§Ø² Ú©Ø§Ø±Ø¨Ø±: {callback.from_user.id}")
+    await callback.message.answer("Ø¯Ø±Ø®ÙˆØ§Ø³Øª Ø´Ù…Ø§ Ø«Ø¨Øª Ø´Ø¯ØŒ Ù…Ù†ØªØ¸Ø± Ù¾Ø§Ø³Ø® Ù…Ø¯ÛŒØ± Ø¨Ø§Ø´ÛŒØ¯.", reply_markup=back_button())
     await callback.answer()
 
 @router.callback_query(F.data == "buy")
@@ -73,8 +73,8 @@ async def handle_buy(callback: CallbackQuery):
     for key, loc in LOCATIONS.items():
         builder.button(text=loc, callback_data=f"loc:{key}")
     builder.adjust(2)
-    builder.row(InlineKeyboardButton(text="🔙 بازگشت", callback_data="main"))
-    await callback.message.answer("کشور مورد نظر را انتخاب کنید:", reply_markup=builder.as_markup())
+    builder.row(InlineKeyboardButton(text="ðŸ”™ Ø¨Ø§Ø²Ú¯Ø´Øª", callback_data="main"))
+    await callback.message.answer("Ú©Ø´ÙˆØ± Ù…ÙˆØ±Ø¯ Ù†Ø¸Ø± Ø±Ø§ Ø§Ù†ØªØ®Ø§Ø¨ Ú©Ù†ÛŒØ¯:", reply_markup=builder.as_markup())
     await callback.answer()
 
 @router.callback_query(F.data.startswith("loc:"))
@@ -86,9 +86,9 @@ async def choose_service(callback: CallbackQuery):
             InlineKeyboardButton(text="vmess", callback_data="srv:vmess"),
             InlineKeyboardButton(text="vless", callback_data="srv:vless")
         ],
-        [InlineKeyboardButton(text="🔙 بازگشت", callback_data="buy")]
+        [InlineKeyboardButton(text="ðŸ”™ Ø¨Ø§Ø²Ú¯Ø´Øª", callback_data="buy")]
     ])
-    await callback.message.answer("نوع سرویس را انتخاب کنید:", reply_markup=kb)
+    await callback.message.answer("Ù†ÙˆØ¹ Ø³Ø±ÙˆÛŒØ³ Ø±Ø§ Ø§Ù†ØªØ®Ø§Ø¨ Ú©Ù†ÛŒØ¯:", reply_markup=kb)
     await callback.answer()
 
 @router.callback_query(F.data.startswith("srv:"))
@@ -97,12 +97,12 @@ async def choose_duration(callback: CallbackQuery):
     user_orders[callback.from_user.id]['service'] = srv
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [
-            InlineKeyboardButton(text="1 ماهه", callback_data="dur:1"),
-            InlineKeyboardButton(text="3 ماهه", callback_data="dur:3")
+            InlineKeyboardButton(text="1 Ù…Ø§Ù‡Ù‡", callback_data="dur:1"),
+            InlineKeyboardButton(text="3 Ù…Ø§Ù‡Ù‡", callback_data="dur:3")
         ],
-        [InlineKeyboardButton(text="🔙 بازگشت", callback_data="buy")]
+        [InlineKeyboardButton(text="ðŸ”™ Ø¨Ø§Ø²Ú¯Ø´Øª", callback_data="buy")]
     ])
-    await callback.message.answer("مدت زمان را انتخاب کنید:", reply_markup=kb)
+    await callback.message.answer("Ù…Ø¯Øª Ø²Ù…Ø§Ù† Ø±Ø§ Ø§Ù†ØªØ®Ø§Ø¨ Ú©Ù†ÛŒØ¯:", reply_markup=kb)
     await callback.answer()
 
 @router.callback_query(F.data.startswith("dur:"))
@@ -112,10 +112,10 @@ async def choose_volume(callback: CallbackQuery):
     volumes = [20, 30, 50, 80, 100] if duration == 1 else [50, 100, 200]
     builder = InlineKeyboardBuilder()
     for v in volumes:
-        builder.button(text=f"{v} گیگ", callback_data=f"vol:{v}")
+        builder.button(text=f"{v} Ú¯ÛŒÚ¯", callback_data=f"vol:{v}")
     builder.adjust(3)
-    builder.row(InlineKeyboardButton(text="🔙 بازگشت", callback_data="buy"))
-    await callback.message.answer("حجم مورد نظر را انتخاب کنید:", reply_markup=builder.as_markup())
+    builder.row(InlineKeyboardButton(text="ðŸ”™ Ø¨Ø§Ø²Ú¯Ø´Øª", callback_data="buy"))
+    await callback.message.answer("Ø­Ø¬Ù… Ù…ÙˆØ±Ø¯ Ù†Ø¸Ø± Ø±Ø§ Ø§Ù†ØªØ®Ø§Ø¨ Ú©Ù†ÛŒØ¯:", reply_markup=builder.as_markup())
     await callback.answer()
 
 @router.callback_query(F.data.startswith("vol:"))
@@ -128,33 +128,33 @@ async def final_step(callback: CallbackQuery):
     order['price'] = price
 
     summary = (
-        f"<b>✉️ مشخصات سفارش:</b>\n"
-        f"کشور: {LOCATIONS[order['location']]}\n"
-        f"سرویس: {order['service']}\n"
-        f"مدت: {order['duration']} ماه\n"
-        f"حجم: {vol} گیگ\n"
-        f"<b>مبلغ: {price:,} تومان</b>\n\n"
-        f"لطفاً مبلغ را به شماره کارت زیر واریز کرده و سپس فیش را ارسال کنید:\n"
-        f"<code>6037-9918-7450-3889</code>\n(به نام احمدرضا اله دادی)"
+        f"<b>âœ‰ï¸ Ù…Ø´Ø®ØµØ§Øª Ø³ÙØ§Ø±Ø´:</b>\n"
+        f"Ú©Ø´ÙˆØ±: {LOCATIONS[order['location']]}\n"
+        f"Ø³Ø±ÙˆÛŒØ³: {order['service']}\n"
+        f"Ù…Ø¯Øª: {order['duration']} Ù…Ø§Ù‡\n"
+        f"Ø­Ø¬Ù…: {vol} Ú¯ÛŒÚ¯\n"
+        f"<b>Ù…Ø¨Ù„Øº: {price:,} ØªÙˆÙ…Ø§Ù†</b>\n\n"
+        f"Ù„Ø·ÙØ§Ù‹ Ù…Ø¨Ù„Øº Ø±Ø§ Ø¨Ù‡ Ø´Ù…Ø§Ø±Ù‡ Ú©Ø§Ø±Øª Ø²ÛŒØ± ÙˆØ§Ø±ÛŒØ² Ú©Ø±Ø¯Ù‡ Ùˆ Ø³Ù¾Ø³ ÙÛŒØ´ Ø±Ø§ Ø§Ø±Ø³Ø§Ù„ Ú©Ù†ÛŒØ¯:\n"
+        f"<code>6037-9918-7450-3889</code>\n(Ø¨Ù‡ Ù†Ø§Ù… Ø§Ø­Ù…Ø¯Ø±Ø¶Ø§ Ø§Ù„Ù‡ Ø¯Ø§Ø¯ÛŒ)"
     )
 
     kb = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="✅ ارسال فیش", callback_data="paid")],
-        [InlineKeyboardButton(text="🔙 بازگشت", callback_data="buy")]
+        [InlineKeyboardButton(text="âœ… Ø§Ø±Ø³Ø§Ù„ ÙÛŒØ´", callback_data="paid")],
+        [InlineKeyboardButton(text="ðŸ”™ Ø¨Ø§Ø²Ú¯Ø´Øª", callback_data="buy")]
     ])
     await callback.message.answer(summary, reply_markup=kb)
     await callback.answer()
 
 @router.callback_query(F.data == "paid")
 async def wait_for_receipt(callback: CallbackQuery):
-    await callback.message.answer("لطفاً تصویر فیش واریزی را ارسال کنید.")
+    await callback.message.answer("Ù„Ø·ÙØ§Ù‹ ØªØµÙˆÛŒØ± ÙÛŒØ´ ÙˆØ§Ø±ÛŒØ²ÛŒ Ø±Ø§ Ø§Ø±Ø³Ø§Ù„ Ú©Ù†ÛŒØ¯.")
     await callback.answer()
 
 @router.message(F.content_type == ContentType.PHOTO)
 async def handle_photo_receipt(message: Message):
     if message.from_user.id in user_orders:
         await message.forward(ADMIN_ID)
-        await message.answer("فیش شما ارسال شد. لطفا منتظر تایید مدیر بمانید.")
+        await message.answer("ÙÛŒØ´ Ø´Ù…Ø§ Ø§Ø±Ø³Ø§Ù„ Ø´Ø¯. Ù„Ø·ÙØ§ Ù…Ù†ØªØ¸Ø± ØªØ§ÛŒÛŒØ¯ Ù…Ø¯ÛŒØ± Ø¨Ù…Ø§Ù†ÛŒØ¯.")
 
 @router.message(Command("send_config"))
 async def handle_config(message: Message):
@@ -162,19 +162,19 @@ async def handle_config(message: Message):
         return
     parts = message.text.split(" ", 2)
     if len(parts) < 3:
-        await message.answer("فرمت صحیح: /send_config user_id کانفیگ")
+        await message.answer("ÙØ±Ù…Øª ØµØ­ÛŒØ­: /send_config user_id Ú©Ø§Ù†ÙÛŒÚ¯")
         return
     try:
         target_id = int(parts[1])
-        await bot.send_message(target_id, f"✅ کانفیگ شما آماده است:\n\n{parts[2]}")
-        await message.answer("ارسال شد.")
+        await bot.send_message(target_id, f"âœ… Ú©Ø§Ù†ÙÛŒÚ¯ Ø´Ù…Ø§ Ø¢Ù…Ø§Ø¯Ù‡ Ø§Ø³Øª:\n\n{parts[2]}")
+        await message.answer("Ø§Ø±Ø³Ø§Ù„ Ø´Ø¯.")
     except Exception as e:
-        await message.answer(f"خطا: {e}")
+        await message.answer(f"Ø®Ø·Ø§: {e}")
 
 @router.callback_query(F.data == "support")
 async def support_request(callback: CallbackQuery):
     support_waiting_users.add(callback.from_user.id)
-    await callback.message.answer("لطفاً پیام خود را ارسال کنید تا به پشتیبانی منتقل شود:")
+    await callback.message.answer("Ù„Ø·ÙØ§Ù‹ Ù¾ÛŒØ§Ù… Ø®ÙˆØ¯ Ø±Ø§ Ø§Ø±Ø³Ø§Ù„ Ú©Ù†ÛŒØ¯ ØªØ§ Ø¨Ù‡ Ù¾Ø´ØªÛŒØ¨Ø§Ù†ÛŒ Ù…Ù†ØªÙ‚Ù„ Ø´ÙˆØ¯:")
     await callback.answer()
 
 @router.message()
@@ -186,12 +186,12 @@ async def handle_all_messages(message: Message):
         forward = await bot.forward_message(ADMIN_ID, uid, message.message_id)
         await bot.send_message(
             ADMIN_ID,
-            f"📨 پیام جدید از کاربر:\n"
-            f"🆔 <code>{uid}</code>\n"
-            f"پاسخ به این پیام برای پاسخ به کاربر ارسال شود.",
+            f"ðŸ“¨ Ù¾ÛŒØ§Ù… Ø¬Ø¯ÛŒØ¯ Ø§Ø² Ú©Ø§Ø±Ø¨Ø±:\n"
+            f"ðŸ†” <code>{uid}</code>\n"
+            f"Ù¾Ø§Ø³Ø® Ø¨Ù‡ Ø§ÛŒÙ† Ù¾ÛŒØ§Ù… Ø¨Ø±Ø§ÛŒ Ù¾Ø§Ø³Ø® Ø¨Ù‡ Ú©Ø§Ø±Ø¨Ø± Ø§Ø±Ø³Ø§Ù„ Ø´ÙˆØ¯.",
             reply_to_message_id=forward.message_id
         )
-        await message.answer("✅ پیام شما به پشتیبانی ارسال شد.")
+        await message.answer("âœ… Ù¾ÛŒØ§Ù… Ø´Ù…Ø§ Ø¨Ù‡ Ù¾Ø´ØªÛŒØ¨Ø§Ù†ÛŒ Ø§Ø±Ø³Ø§Ù„ Ø´Ø¯.")
         return
 
     if message.from_user.id == ADMIN_ID and message.reply_to_message:
@@ -199,21 +199,21 @@ async def handle_all_messages(message: Message):
             fwd_msg = message.reply_to_message
             if fwd_msg.forward_from:
                 target_user_id = fwd_msg.forward_from.id
-                await bot.send_message(target_user_id, f"📬 پاسخ پشتیبانی:\n{message.text}")
-                await message.answer("✅ پیام شما برای کاربر ارسال شد.")
+                await bot.send_message(target_user_id, f"ðŸ“¬ Ù¾Ø§Ø³Ø® Ù¾Ø´ØªÛŒØ¨Ø§Ù†ÛŒ:\n{message.text}")
+                await message.answer("âœ… Ù¾ÛŒØ§Ù… Ø´Ù…Ø§ Ø¨Ø±Ø§ÛŒ Ú©Ø§Ø±Ø¨Ø± Ø§Ø±Ø³Ø§Ù„ Ø´Ø¯.")
             else:
-                await message.answer("❌ لطفاً روی پیام فوروارد شده از کاربر پاسخ دهید.")
+                await message.answer("âŒ Ù„Ø·ÙØ§Ù‹ Ø±ÙˆÛŒ Ù¾ÛŒØ§Ù… ÙÙˆØ±ÙˆØ§Ø±Ø¯ Ø´Ø¯Ù‡ Ø§Ø² Ú©Ø§Ø±Ø¨Ø± Ù¾Ø§Ø³Ø® Ø¯Ù‡ÛŒØ¯.")
         except Exception as e:
-            await message.answer(f"❌ خطا در ارسال پاسخ: {e}")
+            await message.answer(f"âŒ Ø®Ø·Ø§ Ø¯Ø± Ø§Ø±Ø³Ø§Ù„ Ù¾Ø§Ø³Ø®: {e}")
 
 def back_button():
     return InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="🔙 بازگشت به منو", callback_data="main")]
+        [InlineKeyboardButton(text="ðŸ”™ Ø¨Ø§Ø²Ú¯Ø´Øª Ø¨Ù‡ Ù…Ù†Ùˆ", callback_data="main")]
     ])
 
 @router.callback_query(F.data == "main")
 async def back_to_menu(callback: CallbackQuery):
-    await callback.message.answer("بازگشت به منو:", reply_markup=main_menu())
+    await callback.message.answer("Ø¨Ø§Ø²Ú¯Ø´Øª Ø¨Ù‡ Ù…Ù†Ùˆ:", reply_markup=main_menu())
     await callback.answer()
 
 async def main():
