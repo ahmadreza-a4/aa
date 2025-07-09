@@ -1,15 +1,14 @@
 import os
 import logging
-from aiogram import Bot, Dispatcher, types
+from aiogram import Bot, Dispatcher, types, Router, F
 from aiogram.types import (
     Message, CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup, ContentType
 )
 from aiogram.enums import ParseMode
 from aiogram.fsm.storage.memory import MemoryStorage
-from aiogram import Router
 from aiogram.filters import Command
 from aiogram.utils.keyboard import InlineKeyboardBuilder
-from aiogram import F
+from aiogram.client.default import DefaultBotProperties
 
 API_TOKEN = os.getenv("BOT_TOKEN")
 if not API_TOKEN:
@@ -22,7 +21,10 @@ except ValueError:
 
 logging.basicConfig(level=logging.INFO)
 
-bot = Bot(token=API_TOKEN, parse_mode=ParseMode.HTML)
+bot = Bot(
+    token=API_TOKEN,
+    default=DefaultBotProperties(parse_mode=ParseMode.HTML)
+)
 dp = Dispatcher(storage=MemoryStorage())
 router = Router()
 dp.include_router(router)
@@ -182,26 +184,3 @@ async def main():
 if __name__ == "__main__":
     import asyncio
     asyncio.run(main())
-
-
-from aiogram.webhook.aiohttp_server import setup_application
-from aiohttp import web
-
-async def on_startup(app: web.Application):
-    webhook_url = os.getenv("WEBHOOK_URL")
-    if not webhook_url:
-        raise RuntimeError("WEBHOOK_URL environment variable not set.")
-    await bot.set_webhook(webhook_url)
-
-async def on_shutdown(app: web.Application):
-    await bot.delete_webhook()
-
-def setup_app():
-    app = web.Application()
-    app["bot"] = bot
-    app.on_startup.append(on_startup)
-    app.on_shutdown.append(on_shutdown)
-    return setup_application(app, dp)
-
-if __name__ == "__main__":
-    web.run_app(setup_app(), port=int(os.getenv("PORT", 8080)))
