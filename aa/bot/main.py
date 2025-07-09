@@ -6,7 +6,7 @@ from aiogram.types import (
 )
 from aiogram.enums import ParseMode
 from aiogram.fsm.storage.memory import MemoryStorage
-from aiogram import Router
+from aiogram.router import Router
 from aiogram.filters import Command
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram import F
