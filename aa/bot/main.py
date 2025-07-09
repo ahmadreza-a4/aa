@@ -59,7 +59,7 @@ async def start_cmd(message: Message):
 
 @router.callback_query(F.data == "info")
 async def handle_info(callback: CallbackQuery):
-    await bot.send_message(ADMIN_ID, f"درخواست مشخصات از کاربر: {callback.from_user.id}")
+    await bot.send_message("ADMIN_ID", f"درخواست مشخصات از کاربر: {callback.from_user.id}")
     await callback.message.answer("درخواست شما ثبت شد، منتظر پاسخ مدیر باشید.", reply_markup=back_button())
     await callback.answer()
 
