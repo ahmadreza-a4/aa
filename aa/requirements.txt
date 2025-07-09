@@ -1,4 +1,3 @@
 aiogram
 pydantic
 aiofiles
-python
