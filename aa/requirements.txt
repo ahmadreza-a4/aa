@@ -1,2 +1,4 @@
-aiogram>=3.1.1
-aiohttp
+aiogram
+pydantic
+aiofiles
+python
