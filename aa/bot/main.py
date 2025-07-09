@@ -150,12 +150,12 @@ async def wait_for_receipt(callback: CallbackQuery):
 @router.message(F.content_type == ContentType.PHOTO)
 async def handle_photo_receipt(message: Message):
     if message.from_user.id in user_orders:
-        await message.forward(ADMIN_ID)
+        await message.forward("ADMIN_ID")
         await message.answer("فیش شما ارسال شد. لطفا منتظر تایید مدیر بمانید.")
 
 @router.message(Command("send_config"))
 async def handle_config(message: Message):
-    if message.from_user.id != ADMIN_ID:
+    if message.from_user.id != "ADMIN_ID":
         return
     parts = message.text.split(" ", 2)
     if len(parts) < 3:
