@@ -42,7 +42,6 @@ LOCATIONS = {
 }
 
 user_orders = {}
-pending_receipts = {}  # photo_msg_id: user_id
 
 def main_menu():
     kb = InlineKeyboardMarkup(inline_keyboard=[
@@ -60,7 +59,7 @@ async def start_cmd(message: Message):
 
 @router.callback_query(F.data == "info")
 async def handle_info(callback: CallbackQuery):
-    await bot.send_message("ADMIN_ID", f"درخواست مشخصات از کاربر: {callback.from_user.id}")
+    await bot.send_message(ADMIN_ID, f"درخواست مشخصات از کاربر: {callback.from_user.id}")
     await callback.message.answer("درخواست شما ثبت شد، منتظر پاسخ مدیر باشید.", reply_markup=back_button())
     await callback.answer()
 
@@ -151,57 +150,12 @@ async def wait_for_receipt(callback: CallbackQuery):
 @router.message(F.content_type == ContentType.PHOTO)
 async def handle_photo_receipt(message: Message):
     if message.from_user.id in user_orders:
-        fwd_msg = await message.forward(694246194)
-
-        # ذخیره ارتباط بین پیام فیش و کاربر
-        pending_receipts[fwd_msg.message_id] = message.from_user.id
-
-        # دکمه‌های تایید و رد
-        kb = InlineKeyboardMarkup(inline_keyboard=[
-            [
-                InlineKeyboardButton(text="✅ تایید", callback_data=f"approve:{fwd_msg.message_id}"),
-                InlineKeyboardButton(text="❌ رد", callback_data=f"reject:{fwd_msg.message_id}")
-            ]
-        ])
-
-        await bot.send_message(
-            ADMIN_ID,
-            f"📥 فیش از کاربر <code>{message.from_user.id}</code> دریافت شد.\n\nاقدام لازم را انتخاب کنید:",
-            reply_markup=kb
-        )
-
+        await message.forward(ADMIN_ID)
         await message.answer("فیش شما ارسال شد. لطفا منتظر تایید مدیر بمانید.")
-
-@router.callback_query(F.data.startswith("approve:"))
-async def approve_receipt(callback: CallbackQuery):
-    msg_id = int(callback.data.split(":")[1])
-    user_id = pending_receipts.get(msg_id)
-
-    if not user_id:
-        await callback.answer("❌ اطلاعات فیش یافت نشد.", show_alert=True)
-        return
-
-    await callback.message.edit_text("✅ فیش تایید شد. لطفا کانفیگ را با دستور زیر ارسال کنید:\n" +
-                                     f"/send_config {user_id} کانفیگ")
-
-    await callback.answer("منتظر ارسال کانفیگ توسط شما.")
-
-@router.callback_query(F.data.startswith("reject:"))
-async def reject_receipt(callback: CallbackQuery):
-    msg_id = int(callback.data.split(":")[1])
-    user_id = pending_receipts.get(msg_id)
-
-    if not user_id:
-        await callback.answer("❌ اطلاعات فیش یافت نشد.", show_alert=True)
-        return
-
-    await bot.send_message(user_id, "❌ فیش ارسالی شما توسط مدیر تایید نشد. لطفاً دوباره ارسال کنید یا با پشتیبانی تماس بگیرید.")
-    await callback.message.edit_text("❌ فیش رد شد و به کاربر اطلاع داده شد.")
-    await callback.answer("فیش رد شد.")
 
 @router.message(Command("send_config"))
 async def handle_config(message: Message):
-    if message.from_user.id != 694246194:
+    if message.from_user.id != ADMIN_ID:
         return
     parts = message.text.split(" ", 2)
     if len(parts) < 3:
