@@ -60,7 +60,7 @@ async def start_cmd(message: Message):
 
 @router.callback_query(F.data == "info")
 async def handle_info(callback: CallbackQuery):
-    await bot.send_message(ADMIN_ID, f"درخواست مشخصات از کاربر: {callback.from_user.id}")
+    await bot.send_message("ADMIN_ID", f"درخواست مشخصات از کاربر: {callback.from_user.id}")
     await callback.message.answer("درخواست شما ثبت شد، منتظر پاسخ مدیر باشید.", reply_markup=back_button())
     await callback.answer()
 
@@ -151,7 +151,7 @@ async def wait_for_receipt(callback: CallbackQuery):
 @router.message(F.content_type == ContentType.PHOTO)
 async def handle_photo_receipt(message: Message):
     if message.from_user.id in user_orders:
-        fwd_msg = await message.forward(ADMIN_ID)
+        fwd_msg = await message.forward("ADMIN_ID")
 
         # ذخیره ارتباط بین پیام فیش و کاربر
         pending_receipts[fwd_msg.message_id] = message.from_user.id
@@ -201,7 +201,7 @@ async def reject_receipt(callback: CallbackQuery):
 
 @router.message(Command("send_config"))
 async def handle_config(message: Message):
-    if message.from_user.id != ADMIN_ID:
+    if message.from_user.id != "ADMIN_ID":
         return
     parts = message.text.split(" ", 2)
     if len(parts) < 3:
