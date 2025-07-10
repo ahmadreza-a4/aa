@@ -155,20 +155,36 @@ async def handle_photo_receipt(message: Message):
         await message.forward(ADMIN_ID)
         await message.answer("فیش شما ارسال شد. لطفا منتظر تایید مدیر بمانید.")
 
-@router.message(Command("send_config"))
-async def handle_config(message: Message):
-    if message.from_user.id != ADMIN_ID:
-        return
-    parts = message.text.split(" ", 2)
-    if len(parts) < 3:
-        await message.answer("فرمت صحیح: /send_config user_id کانفیگ")
-        return
-    try:
-        target_id = int(parts[1])
-        await bot.send_message(target_id, f"✅ کانفیگ شما آماده است:\n\n{parts[2]}")
-        await message.answer("ارسال شد.")
-    except Exception as e:
-        await message.answer(f"خطا: {e}")
+@router.message(F.content_type == ContentType.PHOTO)
+async def handle_photo_receipt(message: Message):
+    if message.from_user.id in user_orders:
+        user_id = message.from_user.id
+        username = message.from_user.username or "ندارد"
+
+        caption = (
+            f"🧾 فیش واریزی جدید\n"
+            f"👤 یوزر: <code>{user_id}</code>\n"
+            f"نام کاربری: @{username}"
+        )
+
+        photo = message.photo[-1]  # با کیفیت‌ترین نسخه عکس
+        keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(
+                text="🛠 ارسال کانفیگ به کاربر",
+                switch_inline_query_current_chat=f"/send_config {user_id} "
+            )]
+        ])
+
+        await bot.send_photo(
+            chat_id=ADMIN_ID,
+            photo=photo.file_id,
+            caption=caption,
+            parse_mode=ParseMode.HTML,
+            reply_markup=keyboard
+        )
+
+        await message.answer("✅ فیش شما ارسال شد. لطفاً منتظر تایید مدیر بمانید.")
+
 
 def back_button():
     return InlineKeyboardMarkup(inline_keyboard=[
