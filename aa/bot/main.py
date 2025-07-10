@@ -1,5 +1,6 @@
 import os
 import logging
+import html
 from aiogram import Bot, Dispatcher, types, Router, F
 from aiogram.types import (
     Message, CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup, ContentType
@@ -42,13 +43,11 @@ LOCATIONS = {
 }
 
 user_orders = {}
-support_waiting_users = set()
 
 def main_menu():
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="✨ خرید اشتراک", callback_data="buy")],
-        [InlineKeyboardButton(text="ℹ️ مشخصات اشتراک", callback_data="info")],
-        [InlineKeyboardButton(text="📩 ارتباط با پشتیبانی", callback_data="support")]
+        [InlineKeyboardButton(text="ℹ️ مشخصات اشتراک", callback_data="info")]
     ])
     return kb
 
@@ -152,22 +151,16 @@ async def wait_for_receipt(callback: CallbackQuery):
 @router.message(F.content_type == ContentType.PHOTO)
 async def handle_photo_receipt(message: Message):
     if message.from_user.id in user_orders:
-        await message.forward(ADMIN_ID)
-        await message.answer("فیش شما ارسال شد. لطفا منتظر تایید مدیر بمانید.")
-
-@router.message(F.content_type == ContentType.PHOTO)
-async def handle_photo_receipt(message: Message):
-    if message.from_user.id in user_orders:
         user_id = message.from_user.id
         username = message.from_user.username or "ندارد"
 
         caption = (
-            f"🧾 فیش واریزی جدید\n"
+            f"📃 فیش واریزی جدید\n"
             f"👤 یوزر: <code>{user_id}</code>\n"
             f"نام کاربری: @{username}"
         )
 
-        photo = message.photo[-1]  # با کیفیت‌ترین نسخه عکس
+        photo = message.photo[-1]
         keyboard = InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(
                 text="🛠 ارسال کانفیگ به کاربر",
@@ -185,6 +178,23 @@ async def handle_photo_receipt(message: Message):
 
         await message.answer("✅ فیش شما ارسال شد. لطفاً منتظر تایید مدیر بمانید.")
 
+@router.message(Command("send_config"))
+async def handle_config(message: Message):
+    if message.from_user.id != ADMIN_ID:
+        return
+
+    parts = message.text.split(" ", 2)
+    if len(parts) < 3:
+        await message.answer("❌ فرمت صحیح:\n/send_config user_id کانفیگ")
+        return
+
+    try:
+        target_id = int(parts[1])
+        config_text = html.escape(parts[2])
+        await bot.send_message(target_id, f"✅ کانفیگ شما آماده است:\n\n<code>{config_text}</code>", parse_mode=ParseMode.HTML)
+        await message.answer("✅ ارسال شد.")
+    except Exception as e:
+        await message.answer(f"❌ خطا در ارسال: {e}")
 
 def back_button():
     return InlineKeyboardMarkup(inline_keyboard=[
@@ -195,43 +205,6 @@ def back_button():
 async def back_to_menu(callback: CallbackQuery):
     await callback.message.answer("بازگشت به منو:", reply_markup=main_menu())
     await callback.answer()
-
-
-
-@router.callback_query(F.data == "support")
-async def support_request(callback: CallbackQuery):
-    support_waiting_users.add(callback.from_user.id)
-    await callback.message.answer("لطفاً پیام خود را ارسال کنید تا به پشتیبانی منتقل شود:")
-    await callback.answer()
-
-@router.message()
-async def handle_all_messages(message: Message):
-    uid = message.from_user.id
-
-    if uid in support_waiting_users:
-        support_waiting_users.remove(uid)
-        forward = await bot.forward_message(ADMIN_ID, uid, message.message_id)
-        await bot.send_message(
-            ADMIN_ID,
-            f"📨 پیام جدید از کاربر:\n"
-            f"🆔 <code>{uid}</code>\n"
-            f"پاسخ به این پیام برای پاسخ به کاربر ارسال شود.",
-            reply_to_message_id=forward.message_id
-        )
-        await message.answer("✅ پیام شما به پشتیبانی ارسال شد.")
-        return
-
-    if message.from_user.id == ADMIN_ID and message.reply_to_message:
-        try:
-            fwd_msg = message.reply_to_message
-            if fwd_msg.forward_from:
-                target_user_id = fwd_msg.forward_from.id
-                await bot.send_message(target_user_id, f"📬 پاسخ پشتیبانی:\n{message.text}")
-                await message.answer("✅ پیام شما برای کاربر ارسال شد.")
-            else:
-                await message.answer("❌ لطفاً روی پیام فوروارد شده از کاربر پاسخ دهید.")
-        except Exception as e:
-            await message.answer(f"❌ خطا در ارسال پاسخ: {e}")
 
 async def main():
     await dp.start_polling(bot)
