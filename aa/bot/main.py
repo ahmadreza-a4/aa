@@ -170,6 +170,18 @@ async def handle_config(message: Message):
     except Exception as e:
         await message.answer(f"خطا: {e}")
 
+def back_button():
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="🔙 بازگشت به منو", callback_data="main")]
+    ])
+
+@router.callback_query(F.data == "main")
+async def back_to_menu(callback: CallbackQuery):
+    await callback.message.answer("بازگشت به منو:", reply_markup=main_menu())
+    await callback.answer()
+
+
+
 @router.callback_query(F.data == "support")
 async def support_request(callback: CallbackQuery):
     support_waiting_users.add(callback.from_user.id)
@@ -204,16 +216,6 @@ async def handle_all_messages(message: Message):
                 await message.answer("❌ لطفاً روی پیام فوروارد شده از کاربر پاسخ دهید.")
         except Exception as e:
             await message.answer(f"❌ خطا در ارسال پاسخ: {e}")
-
-def back_button():
-    return InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="🔙 بازگشت به منو", callback_data="main")]
-    ])
-
-@router.callback_query(F.data == "main")
-async def back_to_menu(callback: CallbackQuery):
-    await callback.message.answer("بازگشت به منو:", reply_markup=main_menu())
-    await callback.answer()
 
 async def main():
     await dp.start_polling(bot)
